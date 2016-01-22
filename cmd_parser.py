@@ -7,7 +7,7 @@ field -i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float
 '''
 
 
-def cmd_parse(cmd_str, is_print=False, qoute_err=False):
+def cmd_parser(cmd_str, is_print=False, qoute_err=False):
     """
     将一个cmd命令行字符串解析成命令包,字符串中包含转义"\"时,请务必在字符串前加r,否则无法正确解析
     带有空格和"-"的参数值请用双引号包裹,双引号内需要出现双引号的请用斜杠转义 \"
@@ -68,7 +68,7 @@ def cmd_parse(cmd_str, is_print=False, qoute_err=False):
 
         # 如果命令背篓关了,值背篓是开的,就往值背篓里面放
         if not cmd_bag_is_open and val_bag_is_open:
-            if cmd_str[i] != " " and not is_cmd_char and cmd_str[i] !="\"":  # 只要不是空格、引号和命令符就往里面放
+            if (cmd_str[i] != " " or ( cmd_str[i] == " " and qout_start)) and not is_cmd_char and cmd_str[i] !="\"":  # 只要不是空格、引号和命令符就往里面放
                 val_bag.append(cmd_str[i])
             elif cmd_str[i] == "\"" and last_char == "\\":
                 val_bag.append(cmd_str[i])
@@ -125,7 +125,7 @@ def cmd_parse(cmd_str, is_print=False, qoute_err=False):
 
 if __name__ == "__main__":
 
-    print cmd_parse(r' field -i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float"',False)
-    print cmd_parse(r'-i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float"',False)
-    print cmd_parse(r'python -h',False)
-    print cmd_parse(r'python -i love u u u -name u',False)
+    print cmd_parser(r' field -i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float"', False)
+    print cmd_parser(r'-i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float"', False)
+    print cmd_parser(r'python -h', False)
+    print cmd_parser(r'python -i love u u u -name u', False)
