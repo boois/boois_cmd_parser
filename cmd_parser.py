@@ -1,10 +1,15 @@
-# coding:utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 萧鸣-原创:boois@qq.com 2016.1.21
 本模块用于将一串命令行字符串解析成命令组
 field -i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float
 => ('field', {'i': 't', 'r': '/mo\\"-bi/gi', 'l': '1', 't': '-int|+float'})
 '''
+import sys
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
 def cmd_parser(cmd_str, is_print=False, qoute_err=False):
@@ -37,7 +42,7 @@ def cmd_parser(cmd_str, is_print=False, qoute_err=False):
     for i in xrange(len(cmd_str)):  # 逐个字符流状读取
         if is_print:
             print "捡到一个:|" + cmd_str[i] + "|"
-        is_cmd_char = (last_char == " " or i==0) and cmd_str[i] == "-" and not qout_start  # 带空格的横杠,并且引号是闭合的
+        is_cmd_char = (last_char == " " or i == 0) and cmd_str[i] == "-" and not qout_start  # 带空格的横杠,并且引号是闭合的
 
         if is_print:
             if is_cmd_char:
@@ -68,7 +73,8 @@ def cmd_parser(cmd_str, is_print=False, qoute_err=False):
 
         # 如果命令背篓关了,值背篓是开的,就往值背篓里面放
         if not cmd_bag_is_open and val_bag_is_open:
-            if (cmd_str[i] != " " or ( cmd_str[i] == " " and qout_start)) and not is_cmd_char and cmd_str[i] !="\"":  # 只要不是空格、引号和命令符就往里面放
+            if (cmd_str[i] != " " or (cmd_str[i] == " " and qout_start)) and not is_cmd_char and cmd_str[
+                i] != "\"":  # 只要不是空格、引号和命令符就往里面放
                 val_bag.append(cmd_str[i])
             elif cmd_str[i] == "\"" and last_char == "\\":
                 val_bag.append(cmd_str[i])
@@ -119,12 +125,11 @@ def cmd_parser(cmd_str, is_print=False, qoute_err=False):
                 print "一切都结束了,val_bag永远地关闭了"
         last_char = cmd_str[i]
     if qout_start == True and qoute_err:
-        raise  Exception("命令行解析时发现有双引号没有闭合")
+        raise Exception("命令行解析时发现有双引号没有闭合")
     return "".join(field), cmd_store
 
 
 if __name__ == "__main__":
-
     print cmd_parser(r' field -i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float"', False)
     print cmd_parser(r'-i test%s123123 -n -l 1,4 -r "/mo\" -bi/gi" -t "-int|+float"', False)
     print cmd_parser(r'python -h', False)
